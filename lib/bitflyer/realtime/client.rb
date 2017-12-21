@@ -21,8 +21,11 @@ module Bitflyer
     class Client
       attr_accessor *Realtime::CHANNEL_NAMES.map { |name| name.gsub('lightning_', '').downcase.to_sym }
 
-      def initialize
-        @pubnub = Pubnub.new(subscribe_key: Realtime::PUBNUB_SUBSCRIBE_KEY)
+      def initialize(log_level=Logger::WARN)
+        logger = Logger.new('pubnub.log')
+        logger.level = log_level
+
+        @pubnub = Pubnub.new(subscribe_key: Realtime::PUBNUB_SUBSCRIBE_KEY, logger: logger)
 
         @callback = Pubnub::SubscribeCallback.new(
             message: ->(envelope) {
